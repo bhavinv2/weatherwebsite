@@ -14,3 +14,30 @@ st.title("Weather Dashboard")
 
 city = st.text_input("Enter city name:")
 
+if city:
+    try:
+
+        response = requests.get(f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}")
+        response.raise_for_status()
+        data = response.json()
+
+       
+        temperature = data["current"]["temp_c"]
+        wind_speed = data["current"]["wind_kph"]
+        humidity = data["current"]["humidity"]
+        condition = data["current"]["condition"]["text"]
+        icon = data["current"]["condition"]["icon"]
+
+
+        st.subheader(f"Weather in {city}")
+        st.image(f"http:{icon}")
+        st.write(f"**Condition:** {condition}")
+        st.write(f"**Temperature:** {temperature} °C")
+        st.write(f"**Wind Speed:** {wind_speed} kph")
+        st.write(f"**Humidity:** {humidity} %")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error: {e}")
+    except KeyError:
+        st.error("Unexpected response structure. Please check the API response.")
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
